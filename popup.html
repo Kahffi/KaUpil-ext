@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="popup.css">
+    <title>Document</title>
+</head>
+<body>
+    <div>
+        <h1>KaUpil</h1>
+        <!-- Mode Selection (Advance/Simple)-->
+        <div class="modeSelector-container">
+            <span>
+                Enable Advance Mode
+            </span>
+            <button class="modeSelector simple">
+                <div class="selectorCircle"></div>
+            </button>
+        </div> 
+        <div class="simple-section">
+            <label for="global-point">
+                Global Point (1-9)
+                <input type="number" name="globalPoint" id="global-point" min="1" max="9">
+            </label>
+        </div> 
+        <div class="advance-section hidden">
+            <h1>ADVANCED!</h1>
+        </div>
+        <button class="execute">Execute!</button>
+    </div>
+    <script src="popup.js"></script>
+    
+</body>
+</html>

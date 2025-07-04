@@ -1,0 +1,29 @@
+{
+  "manifest_version": 2,
+  "name": "KaUpil",
+  "version": "1.0",
+
+  "description": "Adds a red border to all webpages matching mozilla.org.",
+
+  "icons": {
+    "48": "icons/KaUpil-48.png",
+    "96": "icons/KaUpil-96.png"
+  },
+
+  "permissions": ["activeTab"],
+
+  "browser_action": {
+    "default_icon": "icons/KaUpil-48.png",
+    "default_title": "KaUpil",
+    "default_popup": "popup.html"
+
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["*://evaluasi-pbm.upi.edu/*"],
+      "js": ["kaupil.js"]
+    }
+
+  ]
+}
