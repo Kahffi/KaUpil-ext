@@ -1,45 +1,93 @@
-const modeSelector = document.querySelector(".modeSelector")
-const advanceSection = document.querySelector(".advance-section")
-const simpleSection = document.querySelector(".simple-section")
-const executeBtn = document.querySelector("button.execute")
-const globalPtEl = document.getElementById("global-point")
+const globalPtEl = document.getElementById("global-point");
+const isRandomEl = document.getElementById("is-randomize");
+const randomizeOptEl = document.querySelector(".options");
+const critiqueEl = document.getElementById("critique");
+const randomMin = document.getElementById("randomize-min");
+const randomMax = document.getElementById("randomize-max");
+const currentStepEl = document.getElementById("current-step");
 
-let mode = "simple"
+const form = document.querySelector("form");
+let payload = {
+  isRandomize: false,
+};
 
+let port = null;
 
-// toDisplay and toHide type are Element
-function toggleModeDisplay(toDisplay, toHide){
-    toDisplay.classList.remove("hidden")
-    toHide.classList.add("hidden")
+//connect to content Script
+browser.tabs
+  .query({ active: true, currentWindow: true })
+  .then((tabs) => connectToContentScript(tabs[0]?.id))
+  .catch((e) => console.error(e));
+
+function connectToContentScript(tabId) {
+  port = browser.tabs.connect(tabId, { name: "popup-connection" });
+
+  //  initial handshake
+  port.postMessage({ type: "initial-connection", msg: "hello from popup" });
+  port.onMessage.addListener(commHandler);
 }
 
-modeSelector.addEventListener("click", (e) => {
-    const modeIsSimple = e.target.classList.contains("simple")
-    if (modeIsSimple){
-        modeSelector.classList.replace("simple", "advance")
-        toggleModeDisplay(advanceSection, simpleSection)
-        mode = "advance"
-    } else{
-        modeSelector.classList.replace("advance", "simple")
-        toggleModeDisplay(simpleSection, advanceSection)
-        mode = "simple"
-    }
+function commHandler(msg) {
+  switch (msg.type) {
+    case "step-update":
+      currentStepEl.textContent = msg.msg;
+  }
+}
+// initialize form from previous input
+document.addEventListener("DOMContentLoaded", async () => {
+  const result = await browser.storage.local.get([
+    "globalPoint",
+    "isRandomize",
+    "critique",
+    "randomizeMin",
+    "randomizeMax",
+  ]);
 
-})
+  if (result.globalPoint) {
+    globalPtEl.value = result.globalPoint;
+  }
+  if (result.isRandomize) {
+    isRandomEl.checked = true;
+    randomizeOptEl.classList.remove("hidden");
+  }
+  if (result.critique) {
+    critiqueEl.value = result.critique;
+  }
+  if (result.randomizeMin) {
+    randomMin.value = result.randomizeMin;
+  }
+  if (result.randomizeMax) {
+    randomMax.value = result.randomizeMax;
+  }
+});
 
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
 
-executeBtn.addEventListener("click", () => {
-    const globalPt = globalPtEl.value
-    function sendGlobalPoint(tabs){
-        browser.tabs.sendMessage(tabs[0].id, globalPt)
-    
-    }
+  const formData = new FormData(form);
 
-    executeBtn.textContent = "Loading"
-      browser.tabs
-        .query({ active: true, currentWindow: true })
-        .then(sendGlobalPoint)
-        .catch((e) => console.error(e)).finally(() => executeBtn.textContent = "Execute!");
-    
-})
+  for (const [key, val] of formData.entries()) {
+    payload = { ...payload, [key]: val };
+  }
 
+  browser.tabs
+    .query({ active: true, currentWindow: true })
+    .then((tabs) => browser.tabs.sendMessage(tabs[0].id, payload))
+    .catch((e) => console.error(e));
+
+  browser.storage.local.set(payload);
+});
+
+function showRandomizeFields(isRandomize) {
+  if (isRandomize) {
+    randomizeOptEl.classList.remove("hidden");
+  } else {
+    randomizeOptEl.classList.add("hidden");
+  }
+}
+
+isRandomEl.addEventListener("change", (e) => {
+  const isRandomize = e.target.checked;
+  showRandomizeFields(isRandomize);
+  payload = { ...payload, isRandomized: isRandomize };
+});

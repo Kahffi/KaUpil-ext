@@ -9,25 +9,34 @@
 <body>
     <div>
         <h1>KaUpil</h1>
-        <!-- Mode Selection (Advance/Simple)-->
-        <div class="modeSelector-container">
-            <span>
-                Enable Advance Mode
-            </span>
-            <button class="modeSelector simple">
-                <div class="selectorCircle"></div>
-            </button>
-        </div> 
-        <div class="simple-section">
+        <form>
             <label for="global-point">
                 Global Point (1-9)
                 <input type="number" name="globalPoint" id="global-point" min="1" max="9">
             </label>
-        </div> 
-        <div class="advance-section hidden">
-            <h1>ADVANCED!</h1>
-        </div>
-        <button class="execute">Execute!</button>
+            <label for="critique">
+                    Critique
+                <textarea name="critique" id="critique"></textarea>
+            </label>
+            <div class="randomize-fields">
+                <label for="is-randomize">
+                    Random
+                    <input type="checkbox" name="isRandomize" id="is-randomize" value="true">
+                </label>
+                <div class="options hidden">
+                    <label for="randomize-min">
+                        Minimum
+                        <input type="number" min="1" id="randomize-min" name="randomizeMin" max="9">
+                    </label>
+                    <label for="randomize-max">
+                        Maximum
+                        <input type="number" id="randomize-max" name="randomizeMax" min="1" max="9">
+                    </label>
+                </div>
+            </div>
+            <button type="submit">Execute!</button>
+        </form> 
+        <h2 id="current-step">?</h2>
     </div>
     <script src="popup.js"></script>
     
