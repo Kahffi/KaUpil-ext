@@ -19,31 +19,6 @@ const currentStep = [...document.querySelectorAll("td")]
   .pop()
   .textContent.match(/\d/g)[0];
 
-//   msg: {
-// 	type: String,
-// 	msg: String
-//   }
-function connectionHandler(msg, port) {
-  switch (msg.type) {
-    // Initial connection expecting content-script to tell
-    // the current step
-    case "initial-connection":
-      handleInitialConnection(port);
-  }
-}
-
-function handleInitialConnection(port) {
-  port.postMessage({ type: "step-update", msg: currentStep });
-}
-
-browser.runtime.onConnect.addListener((port) => {
-  if (port.name === "popup-connection") {
-    port.onMessage.addListener((msg) => {
-      connectionHandler(msg, port);
-    });
-  }
-});
-
 browser.runtime.onMessage.addListener((payload) => {
   autofill(
     parseInt(payload.globalPoint),

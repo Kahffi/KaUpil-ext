@@ -4,35 +4,11 @@ const randomizeOptEl = document.querySelector(".options");
 const critiqueEl = document.getElementById("critique");
 const randomMin = document.getElementById("randomize-min");
 const randomMax = document.getElementById("randomize-max");
-const currentStepEl = document.getElementById("current-step");
-
 const form = document.querySelector("form");
 let payload = {
   isRandomize: false,
 };
 
-let port = null;
-
-//connect to content Script
-browser.tabs
-  .query({ active: true, currentWindow: true })
-  .then((tabs) => connectToContentScript(tabs[0]?.id))
-  .catch((e) => console.error(e));
-
-function connectToContentScript(tabId) {
-  port = browser.tabs.connect(tabId, { name: "popup-connection" });
-
-  //  initial handshake
-  port.postMessage({ type: "initial-connection", msg: "hello from popup" });
-  port.onMessage.addListener(commHandler);
-}
-
-function commHandler(msg) {
-  switch (msg.type) {
-    case "step-update":
-      currentStepEl.textContent = msg.msg;
-  }
-}
 // initialize form from previous input
 document.addEventListener("DOMContentLoaded", async () => {
   const result = await browser.storage.local.get([
