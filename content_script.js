@@ -7,6 +7,7 @@
 // 	randomizeMax: "",
 // 	isRandomized: true
 // }
+const cfg = JSON.parse(localStorage.getItem("config"));
 
 // step detection
 // There's no id provided inside the page, the only way i could
@@ -19,14 +20,47 @@ const currentStep = [...document.querySelectorAll("td")]
   .pop()
   .textContent.match(/\d/g)[0];
 
+if (cfg) {
+  switch (currentStep) {
+    case "3":
+      goAnswer();
+      break;
+    case "4":
+      autofill(
+        parseInt(cfg.payload.globalPoint),
+        cfg.payload.critique,
+        cfg.payload.isRandomize,
+        parseInt(cfg.payload.randomizeMin),
+        parseInt(cfg.payload.randomizeMax)
+      );
+      document.querySelector('input[type="submit"]').click();
+      break;
+  }
+}
+
+function goAnswer() {
+  if (cfg.status === "complete") {
+    return;
+  }
+  console.log("Hellow?");
+  // blind pick navigation button to step 4
+  const navBtn = document.querySelector('input[type="submit"]');
+  if (navBtn === null) {
+    localStorage.setItem("config", { ...cfg, status: "complete" });
+    alert("complete");
+    return;
+  }
+  navBtn.click();
+}
+
 browser.runtime.onMessage.addListener((payload) => {
-  autofill(
-    parseInt(payload.globalPoint),
-    payload.critique,
-    payload.isRandomize,
-    parseInt(payload.randomizeMin),
-    parseInt(payload.randomizeMax)
+  if (currentStep !== "3") alert("Arahkan ke step 3 terlebih dahulu");
+  // save config to local storage
+  localStorage.setItem(
+    "config",
+    JSON.stringify({ payload: payload, status: "processing" })
   );
+  goAnswer();
 });
 
 function autofill(nilai = 7, pesan = "mantap", isRandomize, min, max) {
